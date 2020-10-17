@@ -62,16 +62,50 @@ Difference (*L*<sub>*t*</sub> −  &gt; *X*<sub>*t*</sub>) :
 
 ![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-3-1.png)
 
-1.2 ACF & PACF of Xt Looking at the ACF and PACF of the Xt(Figure 1.2a),
-we observe that both have a slight tapering off behavior in small lags,
-implying a non-seasonal ARMA for Xt (we’ll discuss this in greater
-detail in our model selection process from Section 3); at big lags, both
-ACF and PACF also show a tapering off behavior in a seasonal pattern.
-Such a behavior directs us to utilizing Frequency Domain Analysis to
-detect the exact seasonality (this will be done in Section 2).
+1.2 ACF & PACF of Xt Looking at Figure 1.2a, we observe that the ACF and
+PACF of *X*<sub>*t*</sub> are significant at around lag 6, 12, 18, 24,
+a.k.a implying a seasonal pattern of 6 periods. This is suggesting us to
+remove the seasonalities by differencing.
 
     p1 <- ggAcf(data1$Xt, lag.max = 120)+ ggtitle("1st diff of sqrt original")
     p2 <- ggPacf(data1$Xt, lag.max = 120) + ggtitle("1st diff of sqrt original")
     grid.arrange(p1, p2, nrow = 2)
 
 ![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+
+1.3 Seasonal differencing Take Sixth Difference on *X*<sub>*t*</sub>
+(*X*<sub>*t*</sub> −  &gt; *Y*<sub>*t*</sub>) :
+*Y*<sub>*t*</sub> = *X*<sub>*t*</sub> − *X*<sub>*t* − 6</sub>
+
+    data1 <- data1 %>% mutate(Yt = c(NA, NA,NA,NA,NA, diff(data1$Xt, lag = 5)))
+    plot4 <- ggplot() +
+      geom_line(data = data1, aes(X, Yt), color = "black") + geom_hline(yintercept = 0, 
+                    color = "blue", size=0.7) + labs(title="Plot of Yt Time Series with Seasonality Removed",
+            x ="Time", y = "Yt")
+    plot4
+
+![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-5-1.png)
+
+    adf.test(na.remove(data1$Yt))
+
+    ## Warning in adf.test(na.remove(data1$Yt)): p-value smaller than printed p-
+    ## value
+
+    ## 
+    ##  Augmented Dickey-Fuller Test
+    ## 
+    ## data:  na.remove(data1$Yt)
+    ## Dickey-Fuller = -9.3639, Lag order = 5, p-value = 0.01
+    ## alternative hypothesis: stationary
+
+1.4 select a model Augmented Dicky-Fuller test indicates if the data
+correponds to a stationary process, and the above test shows
+*Y*<sub>*t*</sub> is significant at 0.01 confidence level. Therefore, we
+are quite convinced that *Y*<sub>*t*</sub> is a stationary process.
+We’ll fit an ARMA model from here.<br/> From PACF, we see an obvious
+
+    p3 <- ggAcf(data1$Yt, lag.max = 60)+ ggtitle("Yt ACF")
+    p4 <- ggPacf(data1$Yt, lag.max = 60) + ggtitle("Yt PACF")
+    grid.arrange(p3, p4, nrow = 2)
+
+![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-7-1.png)
