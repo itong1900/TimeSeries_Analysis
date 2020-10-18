@@ -234,7 +234,7 @@ Model1: *S**A**R**I**M**A*(4, 1, 2)(0, 1, 0)<sub>12</sub>
 Model2: *S**A**R**I**M**A*(1, 1, 0)(0, 1, 1)<sub>6</sub>
 
     ## Predictions
-    sarima.for(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 6,n.ahead = 12)
+    sarima.for(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 12,n.ahead = 12)
 
 ![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-11-1.png)
 
@@ -243,16 +243,16 @@ Model2: *S**A**R**I**M**A*(1, 1, 0)(0, 1, 1)<sub>6</sub>
     ## Start = 181 
     ## End = 192 
     ## Frequency = 1 
-    ##  [1] 0.7079299 0.7335497 0.7331298 0.7211477 0.6960043 0.7248602 0.7303324
-    ##  [8] 0.7553687 0.7550433 0.7430459 0.7179049 0.7467605
+    ##  [1] 0.7287801 0.7265029 0.6987831 0.6997838 0.6183206 0.6218868 0.6119094
+    ##  [8] 0.6639381 0.6910919 0.6660838 0.6972301 0.7515187
     ## 
     ## $se
     ## Time Series:
     ## Start = 181 
     ## End = 192 
     ## Frequency = 1 
-    ##  [1] 0.06053351 0.07896733 0.09471306 0.10806727 0.11996188 0.13077575
-    ##  [7] 0.14152461 0.15136421 0.16061921 0.16936659 0.17768441 0.18562889
+    ##  [1] 0.05183859 0.06352890 0.07565242 0.08548983 0.09446185 0.10261111
+    ##  [7] 0.11017038 0.11724018 0.12390822 0.13023464 0.13626913 0.14204264
 
     pred_value = matrix(0, nrow = 180, ncol = 1)
 
@@ -272,3 +272,24 @@ Model2: *S**A**R**I**M**A*(1, 1, 0)(0, 1, 1)<sub>6</sub>
       geom_line(data = pred_value, aes(c.1.180., pred_value), color = "red")
 
 ![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-12-1.png)
+
+1.7 Discussion on Model selection
+---------------------------------
+
+    model1 <- sarima(data1$Lt, p=4, d=1, q=2, P=0, D=1, Q=0, S = 12)
+
+![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+
+    model2 <- sarima(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 12)
+
+![](TimeSeries_Analysis_files/figure-markdown_strict/unnamed-chunk-13-2.png)
+
+    ICs <-sapply(list(model1, model2),function(mdl) {c(mdl$AIC, mdl$AICc, mdl$BIC)})
+    colnames(ICs) <-paste0("Model", 1:2)
+    rownames(ICs) <-c('AIC','AICc','BIC')
+    ICs
+
+    ##         Model1    Model2
+    ## AIC  -2.272251 -2.738971
+    ## AICc -2.269491 -2.738586
+    ## BIC  -2.149633 -2.686421

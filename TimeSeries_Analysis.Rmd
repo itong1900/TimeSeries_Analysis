@@ -162,7 +162,7 @@ ggplot() +
 Model2: $SARIMA(1,1,0)(0,1,1)_{6}$
 ```{r}
 ## Predictions
-sarima.for(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 6,n.ahead = 12)
+sarima.for(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 12,n.ahead = 12)
 ```
 
 ```{r}
@@ -186,11 +186,19 @@ ggplot() +
 
 
 
+## 1.7 Discussion on Model selection
+```{r, warning=FALSE, results = "hide"}
+model1 <- sarima(data1$Lt, p=4, d=1, q=2, P=0, D=1, Q=0, S = 12)
+model2 <- sarima(data1$Lt, p=1, d=1, q=0, P=0, D=1, Q=1, S = 12)
+```
 
 
-
-
-
+```{r}
+ICs <-sapply(list(model1, model2),function(mdl) {c(mdl$AIC, mdl$AICc, mdl$BIC)})
+colnames(ICs) <-paste0("Model", 1:2)
+rownames(ICs) <-c('AIC','AICc','BIC')
+ICs
+```
 
 
 
